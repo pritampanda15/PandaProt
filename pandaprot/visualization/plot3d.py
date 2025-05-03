@@ -250,43 +250,23 @@ def save_fullscreen_html(view, output_file: str, title: str = "3D Structure"):
         f.write(html)
 def save_custom_html(view, output_file, title="Protein Interaction Visualization"):
     """
-    Save the py3Dmol view as a custom HTML file with reliable legends and controls.
-    
-    Args:
-        view: py3Dmol view object
-        output_file: Path to save the HTML file
-        title: Title for the HTML page
+    Create a fully self-contained HTML file with reliable legend and hover functionality.
     """
-    # Get the base HTML from py3Dmol
-    html = view._make_html()
+    # First, get the base HTML and extract the essential model data
+    base_html = view._make_html()
     
-    # Define the interaction colors that match your visualization
-    interaction_colors = {
-        'Hydrogen Bonds': 'blue',
-        'Ionic Interactions': 'red',
-        'Salt Bridges': 'yellow',
-        'Hydrophobic Interactions': 'orange',
-        'Pi-Pi Stacking': 'purple',
-        'Pi-Cation': 'green',
-        'Cation-Pi': 'teal',
-        'CH-Pi': 'lightseagreen',
-        'Disulfide Bridges': 'gold',
-        'Sulfur-Aromatic': 'darkkhaki',
-        'Water-Mediated': 'dodgerblue',
-        'Metal Coordination': 'silver',
-        'Halogen Bonds': 'darkturquoise',
-        'Amide-Aromatic': 'mediumorchid',
-        'Van der Waals': 'lightslategray',
-        'Amide-Amide': 'hotpink'
-    }
+    # Extract the model data (this is the crucial part from py3Dmol)
+    import re
+    model_data_match = re.search(r'var glviewer = null;\s*\$\(document\).ready\(function\(\) \{\s*glviewer = \$3Dmol\.createViewer\(.*?, \{.*?\}\);\s*(.*?)glviewer\.render\(\);', base_html, re.DOTALL)
     
-    # Create the legend HTML
-    legend_items = ''
-    for name, color in interaction_colors.items():
-        legend_items += f'<div class="legend-item"><span class="legend-color" style="background-color:{color};"></span>{name}</div>\n'
+    if not model_data_match:
+        print("Warning: Could not extract model data from py3Dmol output. The visualization may be incomplete.")
+        model_setup_code = ""
+    else:
+        model_setup_code = model_data_match.group(1)
     
-    # Complete HTML document with embedded viewer, legend, and controls
-    full_html = f"""<!DOCTYPE html>
+    # Define our custom HTML with explicit positioning and debug logging
+    html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -295,212 +275,254 @@ def save_custom_html(view, output_file, title="Protein Interaction Visualization
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol.js/2.0.3/3Dmol-min.js"></script>
     <style>
-        body, html {{
-            margin: 0;
-            padding: 0;
+        body, html {{ 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            width: 100%; 
             overflow: hidden;
-            height: 100%;
-            width: 100%;
             font-family: Arial, sans-serif;
         }}
-        #container {{
+        
+        #viewer_container {{
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            top: 0;
+            left: 0;
         }}
-        #legend {{
-            position: absolute;
+        
+        #viewer {{
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }}
+        
+        #legend_panel {{
+            position: fixed;
             top: 20px;
             right: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 100;
+            z-index: 1000;
             max-height: 80vh;
             overflow-y: auto;
+            width: 220px;
         }}
-        .legend-header {{
+        
+        .legend_title {{
             font-weight: bold;
-            margin-bottom: 10px;
             text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }}
-        .legend-item {{
-            margin-bottom: 8px;
+        
+        .legend_item {{
             display: flex;
             align-items: center;
+            margin-bottom: 8px;
         }}
-        .legend-color {{
-            display: inline-block;
+        
+        .color_box {{
             width: 16px;
             height: 16px;
-            margin-right: 10px;
+            margin-right: 8px;
             border-radius: 3px;
         }}
-        #controls {{
-            position: absolute;
+        
+        #controls_panel {{
+            position: fixed;
             bottom: 20px;
             left: 20px;
-            z-index: 100;
+            z-index: 1000;
         }}
-        .btn {{
-            background-color: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 10px 15px;
-            margin-right: 10px;
+        
+        .control_button {{
+            background-color: white;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            padding: 8px 15px;
+            margin-right: 10px;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }}
-        .btn:hover {{
-            background-color: rgba(240, 240, 240, 1);
-            transform: translateY(-2px);
+        
+        .control_button:hover {{
+            background-color: #f5f5f5;
         }}
-        #atom-label {{
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            pointer-events: none;
+        
+        #atom_label {{
+            position: fixed;
             display: none;
-            z-index: 200;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }}
-        #toggle-btn {{
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 101;
             background-color: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 5px 8px;
             font-size: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            pointer-events: none;
         }}
     </style>
 </head>
 <body>
-    <div id="container"></div>
-    
-    <div id="legend">
-        <div class="legend-header">Interaction Types</div>
-        {legend_items}
+    <!-- The main 3D viewer container -->
+    <div id="viewer_container">
+        <div id="viewer"></div>
     </div>
     
-    <button id="toggle-btn">Hide Legend</button>
-    
-    <div id="controls">
-        <button class="btn" id="reset-btn">Reset View</button>
-        <button class="btn" id="export-btn">Export PNG</button>
+    <!-- Fixed legend panel -->
+    <div id="legend_panel">
+        <div class="legend_title">Interaction Types</div>
+        <div class="legend_item"><div class="color_box" style="background-color: blue;"></div>Hydrogen Bonds</div>
+        <div class="legend_item"><div class="color_box" style="background-color: red;"></div>Ionic Interactions</div>
+        <div class="legend_item"><div class="color_box" style="background-color: yellow;"></div>Salt Bridges</div>
+        <div class="legend_item"><div class="color_box" style="background-color: orange;"></div>Hydrophobic Interactions</div>
+        <div class="legend_item"><div class="color_box" style="background-color: purple;"></div>Pi-Pi Stacking</div>
+        <div class="legend_item"><div class="color_box" style="background-color: green;"></div>Pi-Cation</div>
+        <div class="legend_item"><div class="color_box" style="background-color: teal;"></div>Cation-Pi</div>
+        <div class="legend_item"><div class="color_box" style="background-color: lightseagreen;"></div>CH-Pi</div>
+        <div class="legend_item"><div class="color_box" style="background-color: gold;"></div>Disulfide Bridges</div>
+        <div class="legend_item"><div class="color_box" style="background-color: darkkhaki;"></div>Sulfur-Aromatic</div>
+        <div class="legend_item"><div class="color_box" style="background-color: dodgerblue;"></div>Water-Mediated</div>
+        <div class="legend_item"><div class="color_box" style="background-color: silver;"></div>Metal Coordination</div>
+        <div class="legend_item"><div class="color_box" style="background-color: darkturquoise;"></div>Halogen Bonds</div>
+        <div class="legend_item"><div class="color_box" style="background-color: mediumorchid;"></div>Amide-Aromatic</div>
+        <div class="legend_item"><div class="color_box" style="background-color: lightslategray;"></div>Van der Waals</div>
+        <div class="legend_item"><div class="color_box" style="background-color: hotpink;"></div>Amide-Amide</div>
     </div>
     
-    <div id="atom-label"></div>
-
+    <!-- Control buttons -->
+    <div id="controls_panel">
+        <button class="control_button" id="reset_view_btn">Reset View</button>
+        <button class="control_button" id="toggle_legend_btn">Hide Legend</button>
+        <button class="control_button" id="export_png_btn">Export PNG</button>
+    </div>
+    
+    <!-- Atom label for hover -->
+    <div id="atom_label"></div>
+    
     <script>
-        // Store the HTML content inside a variable
-        var viewerHTML = `{html.split('<div id="viewer"')[1].split('</div>')[0]}`;
-        
+        // Create viewer when the page is fully loaded
         $(document).ready(function() {{
-            // Insert the viewer
-            $('#container').html('<div id="viewer"' + viewerHTML + '</div>');
+            console.log("Document ready");
             
-            // Wait for the 3Dmol viewer to be initialized
-            setTimeout(function() {{
-                // Access the viewer
-                var viewer = $3Dmol.viewers[0];
-                if (!viewer) {{
-                    console.error("Viewer not initialized!");
-                    return;
-                }}
-                
-                // Store the original view
-                var originalView = viewer.getView();
-                
-                // Set up reset button
-                $('#reset-btn').on('click', function() {{
-                    viewer.setView(originalView);
-                    viewer.render();
-                }});
-                
-                // Set up export button
-                $('#export-btn').on('click', function() {{
-                    var canvas = $('#viewer canvas')[0];
-                    if (canvas) {{
-                        try {{
-                            var link = document.createElement('a');
-                            link.download = 'protein_structure.png';
-                            link.href = canvas.toDataURL('image/png');
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }} catch (e) {{
-                            console.error('Error exporting image:', e);
-                            alert('Error exporting image. This might be due to security restrictions.');
-                        }}
-                    }}
-                }});
-                
-                // Set up legend toggle
-                $('#toggle-btn').on('click', function() {{
-                    if ($('#legend').is(':visible')) {{
-                        $('#legend').hide();
-                        $(this).text('Show Legend');
-                    }} else {{
-                        $('#legend').show();
-                        $(this).text('Hide Legend');
-                    }}
-                }});
-                
-                // Make atoms hoverable
-                viewer.setStyle({{}}, {{"stick": {{"radius": 0.15, "colorscheme": "whiteCarbon"}}}});
-                
-                // Set up atom hover
-                var atomLabel = $('#atom-label');
-                var viewerElement = $('#viewer');
-                
-                // Manual hover tracking since the built-in hover might not work
-                viewerElement.on('mousemove', function(event) {{
-                    var x = event.clientX;
-                    var y = event.clientY;
-                    
-                    // Get atom at this position
-                    var atom = viewer.getAtomAtPosition({{x: x, y: y}});
+            // Create a new 3Dmol viewer
+            var viewer = $3Dmol.createViewer($("#viewer"), {{
+                backgroundAlpha: 0,
+                antialias: true
+            }});
+            
+            // Log viewer creation
+            console.log("Viewer created:", viewer);
+            
+            // Set up the model based on extracted py3Dmol code
+            try {{
+                {model_setup_code}
+                console.log("Model setup complete");
+            }} catch(e) {{
+                console.error("Error setting up model:", e);
+            }}
+            
+            // Make atoms hoverable with slightly larger sticks
+            viewer.setStyle({{}}, {{"stick": {{"radius": 0.2, "colorscheme": "whiteCarbon"}}}});
+            
+            // Set up hover detection
+            const atomLabel = document.getElementById('atom_label');
+            
+            // Store original view for reset
+            var originalView = viewer.getView();
+            console.log("Original view stored");
+            
+            // Function to handle mousemove for atom hover
+            function handleMouseMove(event) {{
+                try {{
+                    // Get atom at mouse position
+                    var atom = viewer.getAtomAtPosition({{x: event.clientX, y: event.clientY}});
                     
                     if (atom) {{
-                        var label = atom.chain + ':' + atom.resi + ' ' + atom.resn + ' ' + atom.atom;
-                        atomLabel.text(label);
-                        atomLabel.css({{
-                            'display': 'block',
-                            'left': (x + 15) + 'px',
-                            'top': (y - 15) + 'px'
-                        }});
+                        // Display atom label
+                        var labelText = atom.chain + ":" + atom.resi + " " + atom.resn + " " + atom.atom;
+                        atomLabel.textContent = labelText;
+                        atomLabel.style.left = (event.clientX + 15) + 'px';
+                        atomLabel.style.top = (event.clientY - 15) + 'px';
+                        atomLabel.style.display = 'block';
                     }} else {{
-                        atomLabel.css('display', 'none');
+                        // Hide atom label
+                        atomLabel.style.display = 'none';
                     }}
-                }});
-                
-                // Re-render to apply all changes
+                }} catch(e) {{
+                    console.error("Error in hover:", e);
+                }}
+            }}
+            
+            // Add mousemove listener to the viewer container
+            document.getElementById('viewer_container').addEventListener('mousemove', handleMouseMove);
+            
+            // Reset view button
+            document.getElementById('reset_view_btn').addEventListener('click', function() {{
+                viewer.setView(originalView);
                 viewer.render();
+                console.log("View reset");
+            }});
+            
+            // Toggle legend button
+            document.getElementById('toggle_legend_btn').addEventListener('click', function() {{
+                var legend = document.getElementById('legend_panel');
+                var button = document.getElementById('toggle_legend_btn');
                 
-                console.log("Viewer setup complete!");
-            }}, 1000);
+                if (legend.style.display === 'none') {{
+                    legend.style.display = 'block';
+                    button.textContent = 'Hide Legend';
+                }} else {{
+                    legend.style.display = 'none';
+                    button.textContent = 'Show Legend';
+                }}
+                console.log("Legend toggled");
+            }});
+            
+            // Export PNG button
+            document.getElementById('export_png_btn').addEventListener('click', function() {{
+                try {{
+                    var canvas = document.querySelector('#viewer canvas');
+                    if (canvas) {{
+                        var link = document.createElement('a');
+                        link.download = 'protein_structure.png';
+                        link.href = canvas.toDataURL('image/png');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        console.log("PNG exported");
+                    }} else {{
+                        console.error("Canvas not found for export");
+                    }}
+                }} catch(e) {{
+                    console.error("Error exporting PNG:", e);
+                    alert("Error exporting image. This might be due to security restrictions.");
+                }}
+            }});
+            
+            // Final render
+            viewer.render();
+            console.log("Initial render complete");
+            
+            // Add a small delay and re-render to ensure everything is displayed properly
+            setTimeout(function() {{
+                viewer.render();
+                console.log("Secondary render complete");
+            }}, 500);
         }});
     </script>
 </body>
 </html>
 """
     
-    # Write the complete HTML to file
+    # Write the HTML to the output file
     with open(output_file, 'w') as f:
-        f.write(full_html)
+        f.write(html)
     
-    print(f"Visualization saved to {output_file}")
+    print(f"Enhanced visualization saved to {output_file}")
