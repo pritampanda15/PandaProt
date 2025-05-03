@@ -3,7 +3,7 @@
 A comprehensive Python application for mapping and visualizing molecular interactions at protein interfaces.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/pritampanda15/PandaProt/main/logo/logo.png" alt="PandaProt Logo" width="400"> 
+  <img src="https://github.com/pritampanda15/PandaProt/blob/main/logo/logo.png" alt="PandaProt Logo" width="400"> 
 </p>
 <p align="center">
   <a href="https://pypi.org/project/pandaprot/">
