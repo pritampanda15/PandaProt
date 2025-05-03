@@ -4,6 +4,8 @@ Module for creating network visualizations of protein interactions.
 """
 
 from typing import Dict, List, Tuple, Set, Optional
+import matplotlib
+matplotlib.use('Agg')  # Use 'Agg' backend for non-GUI environments
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -114,16 +116,17 @@ def create_interaction_network(structure: Structure,
                           count=1,
                           distance=interaction.get('distance', 0))
     
-    # Create visualization
-    plt.figure(figsize=(12, 10))
     
+    # Create visualization
+    fig = plt.figure(figsize=(12, 10))
+
     # Define node colors by chain
     chains = list(set(nx.get_node_attributes(G, 'chain').values()))
     chain_colors = plt.cm.tab10(np.linspace(0, 1, len(chains)))
     chain_color_map = dict(zip(chains, chain_colors))
-    
+
     node_colors = [chain_color_map[G.nodes[node]['chain']] for node in G.nodes]
-    
+
     # Define edge colors by interaction type
     edge_colors = []
     for u, v, attrs in G.edges(data=True):
@@ -137,25 +140,28 @@ def create_interaction_network(structure: Structure,
             edge_colors.append('purple')
         else:
             edge_colors.append('gray')
-    
+
     # Create layout
     pos = nx.spring_layout(G, k=0.3, iterations=50)
-    
+
     # Draw nodes
     nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=100, alpha=0.8)
-    
+
     # Draw edges
     nx.draw_networkx_edges(G, pos, edge_color=edge_colors, width=1.5, alpha=0.7)
-    
+
     # Draw labels
     nx.draw_networkx_labels(G, pos, font_size=8, font_family='sans-serif')
-    
+
     # Add legend
     plt.legend(['Chain ' + chain for chain in chains], 
-              loc='upper right',
-              title='Chains')
-    
+            loc='upper right',
+            title='Chains')
+
     plt.title("Protein Interaction Network")
     plt.axis('off')
-    
-    return G, plt.gcf()
+
+    # ✅ Save the finalized figure here
+    fig.savefig("interaction_network.png", dpi=300, bbox_inches='tight')
+
+    return G, fig

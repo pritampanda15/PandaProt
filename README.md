@@ -25,7 +25,6 @@ A comprehensive Python application for mapping and visualizing molecular interac
     <img src="https://static.pepy.tech/badge/PandaProt" alt="Downloads">
   </a>
 </p>
-## Features
 
 ### Comprehensive Interaction Mapping
 

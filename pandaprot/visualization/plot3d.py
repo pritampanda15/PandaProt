@@ -104,22 +104,14 @@ def create_3d_visualization(pdb_file: str,
                     'dashed': interaction_type in ['hydrogen_bonds', 'salt_bridges', 'ionic_interactions']
                 })
 
-                # Add label at midpoint
-                midpoint = (start + end) / 2
-                view.addLabel(interaction_type.replace('_', ' ').title(), {
-                    'position': {'x': float(midpoint[0]), 'y': float(midpoint[1]), 'z': float(midpoint[2])},
-                    'backgroundColor': 'white',
-                    'fontColor': color,
-                    'fontSize': 12,
-                    'inFront': True,
-                    'showBackground': True
-                })
-
             except Exception:
                 continue  # Silently skip failed interactions
+    # Add labels for the interactions
+    #view.addStyle({}, {"sphere": {"radius": 0.01, "opacity": 0.0}})
+    view.addStyle({}, {"stick": {"radius": 0.1}})  # Makes atoms hoverable
 
     view.zoomTo()
-    save_fullscreen_html(view, "3d.html")
+    #save_fullscreen_html(view, "3d.html")
     return view
 
 def save_fullscreen_html(view, output_file: str, title: str = "3D Structure"):
@@ -162,66 +154,71 @@ def save_custom_html(view, output_file):
     }
     </style>
     """
-
-    # Custom JavaScript for hover labels and legend
     custom_js = """
-    <script>
-    function addCustomFeatures(viewer) {
-        // Define interaction types and their colors
-        const interactions = {
-            'Hydrogen Bonds': 'blue',
-            'Ionic Interactions': 'red',
-            'Salt Bridges': 'yellow',
-            'Hydrophobic Interactions': 'orange',
-            'Pi Stacking': 'purple',
-            'Pi Cation': 'green'
-        };
+<script>
+function addCustomFeatures(viewer) {
+    const interactions = {
+        'Hydrogen Bonds': 'blue',
+        'Ionic Interactions': 'red',
+        'Salt Bridges': 'yellow',
+        'Hydrophobic Interactions': 'orange',
+        'Pi Stacking': 'purple',
+        'Pi Cation': 'green'
+    };
 
-        // Add legend
-        const legend = document.createElement('div');
-        legend.id = 'legend';
-        for (const [name, color] of Object.entries(interactions)) {
-            const item = document.createElement('div');
-            item.className = 'legend-item';
-            item.innerHTML = `<span class="legend-color" style="background-color:${color};"></span>${name}`;
-            legend.appendChild(item);
-        }
-        document.body.appendChild(legend);
-
-        // Add hover labels
-        viewer.setHoverable({}, true,
-            function(atom, viewer) {
-                if (!atom.label) {
-                    atom.label = viewer.addLabel(atom.resn + ":" + atom.atom, {
-                        position: atom,
-                        backgroundColor: 'mintcream',
-                        fontColor: 'black'
-                    });
-                }
-            },
-            function(atom) {
-                if (atom.label) {
-                    viewer.removeLabel(atom.label);
-                    delete atom.label;
-                }
-            }
-        );
-        viewer.render();
+    const legend = document.createElement('div');
+    legend.id = 'legend';
+    for (const [name, color] of Object.entries(interactions)) {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.innerHTML = `<span class="legend-color" style="background-color:${color};"></span>${name}`;
+        legend.appendChild(item);
     }
+    document.body.appendChild(legend);
 
-    // Wait for the viewer to be ready
-    window.addEventListener('load', function() {
-        if (typeof viewer !== 'undefined') {
-            addCustomFeatures(viewer);
+    // Hover labels for atoms
+    viewer.setHoverable({stick: {}}, true);,
+        function(atom, viewer) {
+            if (!atom.label) {
+                atom.label = viewer.addLabel(
+                    atom.chain + ":" + atom.resi + " " + atom.resn + " " + atom.atom,
+                    {
+                        position: atom,
+                        backgroundColor: 'white',
+                        fontColor: 'black',
+                        fontSize: 10
+                    }
+                );
+            }
+        },
+        function(atom) {
+            if (atom.label) {
+                viewer.removeLabel(atom.label);
+                delete atom.label;
+            }
         }
-    });
-    </script>
-    """
+    );
+    viewer.render();
+}
 
-    # Inject custom CSS and JS before closing </body> tag
-    html = html.replace('</body>', custom_css + custom_js + '</body>')
+viewer.on('load', function() {
+    addCustomFeatures(viewer);
+});
+viewer.on('hover', function(atom) {
+    if (atom) {
+        viewer.setHoverable({stick: {}}, true);
+    } else {
+        viewer.setHoverable({stick: {}}, false);
+    }
+    viewer.render();
+});
+</script>
+"""
 
-    # Save the modified HTML
+
+    # Insert the custom CSS and JS into the HTML
+    html = html.replace('</head>', custom_css + '</head>')
+    html = html.replace('</body>', custom_js + '</body>')
+    # Save the modified HTML to a file
     with open(output_file, 'w') as f:
         f.write(html)
-
