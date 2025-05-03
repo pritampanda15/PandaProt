@@ -2,6 +2,29 @@
 
 A comprehensive Python application for mapping and visualizing molecular interactions at protein interfaces.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pritampanda15/PandaProt/main/logo.png" alt="PandaProt Logo" width="400">
+</p>
+<p align="center">
+  <a href="https://pypi.org/project/pandaprot/">
+    <img src="https://img.shields.io/pypi/v/pandaprot.svg" alt="PyPI Version">
+  </a>
+  <a href="https://github.com/pritampanda15/PandaProt/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/pritampanda15/PandaProt" alt="License">
+  </a>
+  <a href="https://github.com/pritampanda15/PandaProt/stargazers">
+    <img src="https://img.shields.io/github/stars/pritampanda15/PandaProt?style=social" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/pritampanda15/PandaMap/issues">
+    <img src="https://img.shields.io/github/issues/pritampanda15/PandaProt" alt="GitHub Issues">
+  </a>
+  <a href="https://github.com/pritampanda15/PandaProt/network/members">
+    <img src="https://img.shields.io/github/forks/pritampanda15/PandaProt?style=social" alt="GitHub Forks">
+  </a>
+  <a href="https://pepy.tech/project/PandaProt">
+    <img src="https://static.pepy.tech/badge/PandaProt" alt="Downloads">
+  </a>
+</p>
 ## Features
 
 ### Comprehensive Interaction Mapping
