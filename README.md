@@ -3,7 +3,7 @@
 A comprehensive Python application for mapping and visualizing molecular interactions at protein interfaces.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/pritampanda15/PandaProt/blob/main/logo/logo.png" alt="PandaProt Logo" width="400"> 
+  <img src="https://raw.githubusercontent.com/pritampanda15/PandaProt/main/logo/logo.png" alt="PandaProt Logo" width="400"> 
 </p>
 <p align="center">
   <a href="https://pypi.org/project/pandaprot/">
@@ -15,7 +15,7 @@ A comprehensive Python application for mapping and visualizing molecular interac
   <a href="https://github.com/pritampanda15/PandaProt/stargazers">
     <img src="https://img.shields.io/github/stars/pritampanda15/PandaProt?style=social" alt="GitHub Stars">
   </a>
-  <a href="https://github.com/pritampanda15/PandaMap/issues">
+  <a href="https://github.com/pritampanda15/PandaProt/issues">
     <img src="https://img.shields.io/github/issues/pritampanda15/PandaProt" alt="GitHub Issues">
   </a>
   <a href="https://github.com/pritampanda15/PandaProt/network/members">
