@@ -5,7 +5,7 @@ Module for detecting disulfide bridges in protein structures.
 
 from typing import Dict, List, Tuple, Optional
 import numpy as np
-from Bio.PDB import Residue
+from Bio.PDB.Residue import Residue
 
 from . import utils
 

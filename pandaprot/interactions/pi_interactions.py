@@ -4,9 +4,9 @@ Module for detecting pi-pi and pi-cation interactions in protein structures.
 
 from typing import Dict, List, Tuple, Set, Optional
 import numpy as np
-from Bio.PDB import Residue
+from Bio.PDB.Structure import Structure
 from Bio.PDB.vectors import Vector
-
+from Bio.PDB.Residue import Residue
 from . import utils
 
 

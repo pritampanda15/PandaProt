@@ -7,7 +7,13 @@ import os
 from typing import List, Dict, Tuple, Optional, Any, Union
 import numpy as np
 import pandas as pd
-from Bio.PDB import PDBParser, Structure, Model, Chain, Residue, Atom
+from Bio.PDB import PDBParser
+from Bio.PDB.Structure import Structure
+from Bio.PDB.Model import Model
+from Bio.PDB.Chain import Chain
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom  
+from Bio.PDB.PDBIO import PDBIO
 from Bio.PDB.vectors import Vector
 import py3Dmol
 import logging as logger

@@ -5,7 +5,9 @@ Module for detecting metal-coordinated bonds in protein structures.
 
 from typing import Dict, List, Tuple, Optional, Set
 import numpy as np
-from Bio.PDB import Residue, Structure
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom 
+from Bio.PDB.Structure import Structure
 
 from . import utils
 

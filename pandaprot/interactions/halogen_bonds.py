@@ -5,7 +5,8 @@ Module for detecting halogen bonds in protein structures.
 
 from typing import Dict, List, Tuple, Optional
 import numpy as np
-from Bio.PDB import Residue, Atom
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom 
 
 from . import utils
 

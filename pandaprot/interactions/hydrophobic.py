@@ -4,7 +4,8 @@ Module for detecting hydrophobic interactions in protein structures.
 
 from typing import Dict, List, Tuple, Set, Optional
 import numpy as np
-from Bio.PDB import Residue
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom 
 
 from . import utils
 

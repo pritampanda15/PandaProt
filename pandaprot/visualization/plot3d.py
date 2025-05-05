@@ -11,8 +11,15 @@ import os
 import base64
 import tempfile
 import numpy as np
-from Bio.PDB import PDBIO, PDBParser, Structure
 import logging as logger
+from Bio.PDB import PDBParser
+from Bio.PDB.Structure import Structure
+from Bio.PDB.Model import Model
+from Bio.PDB.Chain import Chain
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom  
+from Bio.PDB.PDBIO import PDBIO
+from Bio.PDB.vectors import Vector
 
 def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, output_file=None, width=800, height=600, show_surface=False, show_sidechains=True, interaction_types=None):
     """

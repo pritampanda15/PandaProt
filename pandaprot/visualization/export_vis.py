@@ -13,7 +13,14 @@ import tempfile
 import numpy as np
 from Bio.PDB import PDBIO, PDBParser, Structure
 import logging as logger
-
+from Bio.PDB import PDBParser
+from Bio.PDB.Structure import Structure
+from Bio.PDB.Model import Model
+from Bio.PDB.Chain import Chain
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom  
+from Bio.PDB.PDBIO import PDBIO
+from Bio.PDB.vectors import Vector
 
 def export_visualization_scripts(self, output_prefix: str, 
                                 interaction_types: Optional[List[str]] = None):

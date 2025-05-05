@@ -5,7 +5,8 @@ Utility functions for interaction detection.
 
 from typing import List, Tuple, Optional
 import numpy as np
-from Bio.PDB import Atom
+from Bio.PDB.Residue import Residue
+from Bio.PDB.Atom import Atom 
 from Bio.PDB.vectors import Vector
 
 
