@@ -16,6 +16,7 @@ import matplotlib
 # Use 'Agg' backend for non-GUI environments
 matplotlib.use('Agg')  # Use 'Agg' backend for non-GUI environments
 import matplotlib.pyplot as plt
+import time
 
 
 # Import all interaction modules
@@ -575,8 +576,8 @@ class PandaProt:
         output_files["VMD"] = vmd_file
         
         # Export Molstar state file
-        molstar_file = f"{output_prefix}_molstar.js"
-        self._export_molstar_script(molstar_file, pdb_file, filtered_interactions)
+        molstar_file = f"{output_prefix}.molj"
+        self._export_molstar_state(molstar_file, pdb_file, filtered_interactions)
         output_files["Molstar"] = molstar_file
         
         logger.info(f"Exported visualization scripts: {', '.join(output_files.values())}")
@@ -1012,33 +1013,144 @@ class PandaProt:
             
             logger.info(f"Saved VMD script to {output_file}")
 
-    def _export_molstar_script(self, output_file: str, pdb_file: str, 
-                            interactions: Dict[str, List[Dict]]):
-        """Generate MolStar viewer HTML/JS file to visualize interactions."""
-        # Define colors for different interaction types
+    def _export_molstar_state(self, output_file: str, pdb_file: str, 
+                         interactions: Dict[str, List[Dict]]):
+        """
+        Generate Molstar state file (.molj) to visualize interactions.
+        
+        This creates a file that can be directly loaded into the Molstar web viewer
+        at https://molstar.org/viewer/
+        """
+        import json
+        import os
+        
+        # Define colors for different interaction types (hexadecimal integers)
         interaction_colors = {
-            'hydrogen_bonds': '0x0000FF',  # blue
-            'ionic_interactions': '0xFF0000',  # red
-            'salt_bridges': '0xFFFF00',  # yellow
-            'hydrophobic_interactions': '0xFFA500',  # orange
-            'pi_stacking': '0x800080',  # purple
-            'pi_cation': '0x008000',  # green
-            'disulfide': '0xDAA520'  # gold
+            'hydrogen_bonds': 0x0000FF,  # blue
+            'ionic_interactions': 0xFF0000,  # red
+            'salt_bridges': 0xFFFF00,  # yellow
+            'hydrophobic_interactions': 0xFFA500,  # orange
+            'pi_stacking': 0x800080,  # purple
+            'pi_cation': 0x008000,  # green
+            'disulfide': 0xDAA520,  # gold
+            'water_mediated': 0x00BFFF,  # deep sky blue
+            'ch_pi': 0x20B2AA,  # light sea green
+            'halogen_bond': 0x00CED1,  # dark turquoise
+            'van_der_waals': 0x708090,  # slate gray
+            'amide_aromatic': 0x9370DB,  # medium purple
+            'amide_amide': 0xFF69B4   # hot pink
         }
         
-        # Get PDB file base name
+        # Get the PDB file basename for reference in the state
         pdb_basename = os.path.basename(pdb_file)
         
-        # Collect all interactions in a format usable by Molstar
-        molstar_interactions = []
+        # Create the base Molstar state structure
+        state = {
+            "timestamp": int(time.time() * 1000),  # Current time in milliseconds
+            "format": {
+                "name": "molstar-state",
+                "version": "3"
+            },
+            "state": {
+                "viewport": {
+                    "width": 800,
+                    "height": 600
+                },
+                "camera": {
+                    "mode": "perspective",
+                    "fov": 45,
+                    "position": {"x": 0, "y": 0, "z": 100}
+                },
+                "theme": {
+                    "name": "light"
+                },
+                "settings": {
+                    "rendering": {
+                        "quality": "auto",
+                        "background": {
+                            "color": 0xFFFFFF  # White background
+                        }
+                    }
+                },
+                "snapshots": [],
+                "components": {
+                    "root": {
+                        "type": "root",
+                        "transforms": [],
+                        "cell": {"state": {}, "params": {}, "reprList": [], "current": -1},
+                        "assignments": [],
+                        "children": [
+                            {
+                                "type": "data-component",
+                                "dataId": "0",
+                                "label": "Main Structure",
+                                "params": {},
+                                "cell": {
+                                    "state": {},
+                                    "params": {},
+                                    "reprList": [
+                                        {
+                                            "id": "cartoon-representation",
+                                            "type": "representation",
+                                            "params": {
+                                                "type": "cartoon",
+                                                "params": {
+                                                    "quality": "auto",
+                                                    "alpha": 0.7
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "current": 0
+                                },
+                                "transforms": []
+                            }
+                        ]
+                    }
+                },
+                "behaviors": {},
+                "plugin": {}
+            },
+            "data": [
+                {
+                    "id": "0",
+                    "kind": "model",
+                    "format": "pdb",
+                    "source": {
+                        "name": pdb_basename,
+                        "type": "file"
+                    }
+                }
+            ],
+            "annotations": {
+                "groups": [],
+                "annotations": []
+            }
+        }
+        
+        # Create a group for each interaction type
+        group_index = 0
+        annotation_index = 0
         
         for interaction_type, interactions_list in interactions.items():
             if not interactions_list:
                 continue
                 
-            color = interaction_colors.get(interaction_type, "0x808080")  # default gray
+            # Get color for this interaction type
+            color = interaction_colors.get(interaction_type, 0x808080)  # Default gray
+            nice_name = interaction_type.replace('_', ' ').title()
             
-            for i, interaction in enumerate(interactions_list):
+            # Add a group for this interaction type
+            group = {
+                "id": f"group-{group_index}",
+                "color": color,
+                "label": nice_name,
+                "type": "group"
+            }
+            state["annotations"]["groups"].append(group)
+            
+            # Add each interaction as an annotation
+            for interaction in interactions_list:
                 try:
                     # Extract residue info based on interaction type
                     if interaction_type == 'hydrogen_bonds':
@@ -1053,11 +1165,25 @@ class PandaProt:
                         # Skip if missing data
                         if not all([chain1, res1, atom1, chain2, res2, atom2]):
                             continue
-                            
-                        locator1 = f"/chainID:{chain1}/auth_seq_id:{res1}/auth_atom_id:{atom1}"
-                        locator2 = f"/chainID:{chain2}/auth_seq_id:{res2}/auth_atom_id:{atom2}"
+                        
+                        target1 = {
+                            "labelAsId": False, 
+                            "entityId": "0", 
+                            "chainId": chain1,
+                            "residueNumber": int(res1) if res1.isdigit() else res1, 
+                            "atomName": atom1
+                        }
+                        
+                        target2 = {
+                            "labelAsId": False, 
+                            "entityId": "0", 
+                            "chainId": chain2,
+                            "residueNumber": int(res2) if res2.isdigit() else res2, 
+                            "atomName": atom2
+                        }
                         
                     elif interaction_type in ['ionic_interactions', 'salt_bridges']:
+                        # Similar extraction as in other functions
                         if all(k in interaction for k in ['positive_residue', 'positive_chain']):
                             chain1 = interaction.get('positive_chain')
                             res1 = interaction.get('positive_residue', '').split()[-1] if ' ' in interaction.get('positive_residue', '') else interaction.get('positive_residue', '')
@@ -1075,221 +1201,152 @@ class PandaProt:
                             chain2 = interaction.get('chain2')
                             res2 = interaction.get('residue2', '').split()[-1] if ' ' in interaction.get('residue2', '') else interaction.get('residue2', '')
                             atom2 = interaction.get('atom2')
-                            
-                        # Skip if missing data
+                        
+                        # Skip if missing essential data
                         if not all([chain1, res1, chain2, res2]):
                             continue
                         
                         # Use CA atoms if specific atoms not provided
-                        if atom1:
-                            locator1 = f"/chainID:{chain1}/auth_seq_id:{res1}/auth_atom_id:{atom1}"
-                        else:
-                            locator1 = f"/chainID:{chain1}/auth_seq_id:{res1}/auth_atom_id:CA"
-                            
-                        if atom2:
-                            locator2 = f"/chainID:{chain2}/auth_seq_id:{res2}/auth_atom_id:{atom2}"
-                        else:
-                            locator2 = f"/chainID:{chain2}/auth_seq_id:{res2}/auth_atom_id:CA"
+                        if not atom1:
+                            atom1 = "CA"
+                        if not atom2:
+                            atom2 = "CA"
+                        
+                        target1 = {
+                            "labelAsId": False, 
+                            "entityId": "0", 
+                            "chainId": chain1,
+                            "residueNumber": int(res1) if res1.isdigit() else res1, 
+                            "atomName": atom1
+                        }
+                        
+                        target2 = {
+                            "labelAsId": False, 
+                            "entityId": "0", 
+                            "chainId": chain2,
+                            "residueNumber": int(res2) if res2.isdigit() else res2, 
+                            "atomName": atom2
+                        }
                     
                     else:
                         # Generic handling for other interaction types
                         chain1 = interaction.get('chain1', interaction.get('residue1_chain'))
                         res1 = interaction.get('residue1', '').split()[-1] if ' ' in interaction.get('residue1', '') else interaction.get('residue1', '')
+                        atom1 = interaction.get('atom1')
                         
                         chain2 = interaction.get('chain2', interaction.get('residue2_chain'))
                         res2 = interaction.get('residue2', '').split()[-1] if ' ' in interaction.get('residue2', '') else interaction.get('residue2', '')
+                        atom2 = interaction.get('atom2')
                         
-                        # Skip if missing data
+                        # Skip if missing essential data
                         if not all([chain1, res1, chain2, res2]):
                             continue
-                            
-                        locator1 = f"/chainID:{chain1}/auth_seq_id:{res1}/auth_atom_id:CA"
-                        locator2 = f"/chainID:{chain2}/auth_seq_id:{res2}/auth_atom_id:CA"
+                        
+                        # Use CA atoms if specific atoms not provided
+                        if not atom1:
+                            atom1 = "CA"
+                        if not atom2:
+                            atom2 = "CA"
+                        
+                        target1 = {
+                            "labelAsId": False, 
+                            "entityId": "0", 
+                            "chainId": chain1,
+                            "residueNumber": int(res1) if res1.isdigit() else res1, 
+                            "atomName": atom1
+                        }
+                        
+                        target2 = {
+                            "labelAsId": False, 
+                            "entityId": "0", 
+                            "chainId": chain2,
+                            "residueNumber": int(res2) if res2.isdigit() else res2, 
+                            "atomName": atom2
+                        }
                     
-                    # Add this interaction to the list
-                    molstar_interactions.append({
-                        'type': interaction_type.replace('_', ' ').title(),
-                        'color': color,
-                        'locator1': locator1,
-                        'locator2': locator2,
-                        'label': f"{interaction_type.replace('_', ' ').title()} {chain1}:{res1} - {chain2}:{res2}"
-                    })
+                    # Create the distance annotation
+                    annotation = {
+                        "id": f"annotation-{annotation_index}",
+                        "type": "distance",
+                        "targets": [target1, target2],
+                        "color": color,
+                        "label": f"{nice_name} {chain1}:{res1}-{chain2}:{res2}",
+                        "groupId": f"group-{group_index}"
+                    }
+                    
+                    state["annotations"]["annotations"].append(annotation)
+                    annotation_index += 1
                     
                 except Exception as e:
                     logger.warning(f"Error processing interaction for Molstar: {e}")
                     continue
-        
-        # Write HTML with embedded JavaScript for Molstar
-        with open(output_file, 'w') as f:
-            # Write a complete HTML file with the Molstar viewer and our data
-            f.write(f"""<!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-        <title>PandaProt - Protein Interactions in Molstar</title>
-        <style>
-            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-            html, body {{ width: 100%; height: 100%; }}
-            #viewer {{ width: 100%; height: 100%; }}
-            #legend {{ 
-                position: absolute; 
-                top: 10px; 
-                right: 10px; 
-                background: rgba(255, 255, 255, 0.8); 
-                padding: 10px; 
-                border-radius: 5px;
-                z-index: 1000;
-            }}
-            .legend-item {{ 
-                display: flex; 
-                align-items: center; 
-                margin: 5px 0; 
-            }}
-            .color-box {{ 
-                width: 15px; 
-                height: 15px; 
-                margin-right: 8px; 
-                border: 1px solid #999; 
-            }}
-        </style>
-        <script src="https://unpkg.com/molstar@3.30.0/lib/molstar.js"></script>
-    </head>
-    <body>
-        <div id="viewer"></div>
-        <div id="legend">
-            <h3>Interaction Types</h3>
-            <div id="legend-items"></div>
-        </div>
-        
-        <script>
-            // Initialize the Molstar viewer
-            async function init() {{
-                // Create viewer
-                const viewer = new molstar.Viewer('viewer', {{
-                    layoutIsExpanded: false,
-                    layoutShowControls: false,
-                    layoutShowRemoteState: false,
-                    layoutShowSequence: true,
-                    layoutShowLog: false,
-                    layoutShowLeftPanel: false,
-                    volumeStreamingDisabled: true,
-                    viewportShowExpand: true,
-                    viewportShowSelectionMode: false,
-                    viewportShowAnimation: false,
-                    viewportShowTrackball: false,
-                    viewportShowSlices: false,
-                    viewportShowAxis: false,
-                    viewportShowFog: false
-                }});
-                
-                // Load the PDB file
-                const data = await viewer.loadPdb('{pdb_basename}', {{ 
-                    representationParams: {{ 
-                        theme: {{ globalName: 'chain-id' }},
-                        type: 'cartoon',
-                        color: 'chain-id',
-                        opacity: 0.7
-                    }}
-                }});
-                
-                // Setup the shape component for interactions
-                const shapeComp = await viewer.build().to(data.buildNode).apply(molstar.MeshBuilder.createShape()).commit();
-                
-                // Set initial camera position
-                const camera = viewer.plugin.canvas3d?.camera;
-                
-                // Add each interaction
-                const interactions = {str(molstar_interactions).replace("'", '"')};
-                const interactionTypes = new Set(interactions.map(i => i.type));
-                
-                // Create legend
-                const legendItems = document.getElementById('legend-items');
-                const typesAndColors = Array.from(interactionTypes).map(type => {{
-                    const color = interactions.find(i => i.type === type).color;
-                    return {{ type, color }};
-                }});
-                
-                // Sort and add legend items
-                typesAndColors.sort((a, b) => a.type.localeCompare(b.type));
-                typesAndColors.forEach(item => {{
-                    const div = document.createElement('div');
-                    div.className = 'legend-item';
-                    
-                    const colorBox = document.createElement('div');
-                    colorBox.className = 'color-box';
-                    colorBox.style.backgroundColor = '#' + item.color.substring(2);
-                    
-                    const label = document.createElement('span');
-                    label.textContent = item.type;
-                    
-                    div.appendChild(colorBox);
-                    div.appendChild(label);
-                    legendItems.appendChild(div);
-                }});
-                
-                // Add interactions to the viewer
-                for (const interaction of interactions) {{
-                    try {{
-                        // Get atom positions
-                        const lociA = data.selectLoci({{ label_entity: interaction.locator1 }});
-                        const lociB = data.selectLoci({{ label_entity: interaction.locator2 }});
-                        
-                        if (!lociA || !lociB) continue;
-                        
-                        const posA = data.getLoci3DPosition(lociA);
-                        const posB = data.getLoci3DPosition(lociB);
-                        
-                        if (!posA || !posB) continue;
-                        
-                        // Draw a cylinder between atoms
-                        const builder = viewer.build().to(shapeComp);
-                        builder.addCylinder(
-                            {{ x: posA.x, y: posA.y, z: posA.z }}, 
-                            {{ x: posB.x, y: posB.y, z: posB.z }}, 
-                            {{ radius: 0.1, radiusTop: 0.1, color: interaction.color, dashed: true }}
-                        );
-                        
-                        // Highlight the residues
-                        const residueA = data.selectLoci({{ 
-                            label_entity: interaction.locator1.substring(0, interaction.locator1.lastIndexOf('/')) 
-                        }});
-                        const residueB = data.selectLoci({{ 
-                            label_entity: interaction.locator2.substring(0, interaction.locator2.lastIndexOf('/')) 
-                        }});
-                        
-                        builder.addRepresentation('ball-and-stick', {{ 
-                            theme: {{ globalName: 'element-symbol' }},
-                            color: 'element-symbol',
-                            loci: [residueA, residueB]
-                        }});
-                        
-                        builder.commit();
-                        
-                        // Add a label
-                        viewer.plugin.labels?.addLabel(interaction.label, {{ 
-                            x: (posA.x + posB.x) / 2, 
-                            y: (posA.y + posB.y) / 2, 
-                            z: (posA.z + posB.z) / 2 
-                        }});
-                        
-                    }} catch (e) {{
-                        console.error('Error adding interaction', e);
-                    }}
-                }}
-                
-                // final settings
-                viewer.plugin.canvas3d?.setBackground({{ color: 0xffffff }});
-                viewer.plugin.canvas3d?.setDimension({{ x: 800, y: 800 }});
-                
-                // Focus view
-                viewer.plugin.canvas3d?.requestCameraReset();
-            }}
             
-            // Call the init function when the page loads
-            window.addEventListener('load', init);
-        </script>
-    </body>
-    </html>""")
+            # Increment group index for the next type
+            group_index += 1
         
-        logger.info(f"Saved Molstar viewer to {output_file}")
+        # Also add a representation to highlight all interacting residues
+        all_interacting_residues = set()
+        
+        # Collect all residues involved in interactions
+        for interaction_type, interactions_list in interactions.items():
+            for interaction in interactions_list:
+                try:
+                    # Extract residue info by interaction type (simplified for clarity)
+                    if interaction_type == 'hydrogen_bonds':
+                        chain1, res1 = interaction.get('donor_chain'), interaction.get('donor_residue', '').split()[-1] if ' ' in interaction.get('donor_residue', '') else interaction.get('donor_residue', '')
+                        chain2, res2 = interaction.get('acceptor_chain'), interaction.get('acceptor_residue', '').split()[-1] if ' ' in interaction.get('acceptor_residue', '') else interaction.get('acceptor_residue', '')
+                    elif interaction_type in ['ionic_interactions', 'salt_bridges']:
+                        if all(k in interaction for k in ['positive_residue', 'positive_chain']):
+                            chain1, res1 = interaction.get('positive_chain'), interaction.get('positive_residue', '').split()[-1] if ' ' in interaction.get('positive_residue', '') else interaction.get('positive_residue', '')
+                            chain2, res2 = interaction.get('negative_chain'), interaction.get('negative_residue', '').split()[-1] if ' ' in interaction.get('negative_residue', '') else interaction.get('negative_residue', '')
+                        else:
+                            chain1, res1 = interaction.get('chain1'), interaction.get('residue1', '').split()[-1] if ' ' in interaction.get('residue1', '') else interaction.get('residue1', '')
+                            chain2, res2 = interaction.get('chain2'), interaction.get('residue2', '').split()[-1] if ' ' in interaction.get('residue2', '') else interaction.get('residue2', '')
+                    else:
+                        chain1, res1 = interaction.get('chain1', interaction.get('residue1_chain')), interaction.get('residue1', '').split()[-1] if ' ' in interaction.get('residue1', '') else interaction.get('residue1', '')
+                        chain2, res2 = interaction.get('chain2', interaction.get('residue2_chain')), interaction.get('residue2', '').split()[-1] if ' ' in interaction.get('residue2', '') else interaction.get('residue2', '')
+                    
+                    # Add to set if we have valid data
+                    if chain1 and res1:
+                        all_interacting_residues.add((chain1, res1))
+                    if chain2 and res2:
+                        all_interacting_residues.add((chain2, res2))
+                        
+                except Exception:
+                    continue
+        
+        # Add a ball-and-stick representation for interacting residues
+        if all_interacting_residues:
+            # Create a Molstar selection expression for all interacting residues
+            selection_parts = []
+            for chain, res in all_interacting_residues:
+                res_num = res if res.isdigit() else f"'{res}'"  # Handle non-numeric residue IDs
+                selection_parts.append(f"(chain {chain} and residue {res_num})")
+            
+            selection_expression = " or ".join(selection_parts)
+            
+            # Add a new representation for these residues
+            state["state"]["components"]["root"]["children"][0]["cell"]["reprList"].append({
+                "id": "interacting-residues",
+                "type": "representation",
+                "params": {
+                    "type": "ball-and-stick",
+                    "params": {
+                        "quality": "auto",
+                        "alpha": 1.0,
+                        "aspectRatio": 2.0,
+                        "bondSpacing": 1.0,
+                        "bondOrder": True
+                    }
+                }
+            })
+        
+        # Write the state file
+        try:
+            with open(output_file, 'w') as f:
+                json.dump(state, f, indent=2)
+            logger.info(f"Saved Molstar state file to {output_file}")
+        except Exception as e:
+            logger.error(f"Error saving Molstar state file: {e}")
+        
+        return output_file
