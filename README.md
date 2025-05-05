@@ -1,6 +1,6 @@
 # PandaProt
 
-A comprehensive Python application for mapping and visualizing molecular interactions at protein/nucleic acid interfaces.
+A comprehensive Python application for mapping and visualizing molecular interactions at protein/nucleic acid interfaces. A tool for mapping protein-protein, protein-nucleic acid, and antigen-antibody interactions.
 
 <p align="center">
   <img src="https://github.com/pritampanda15/PandaProt/blob/main/logo/logo.png" alt="PandaProt Logo" width="400"> 
@@ -425,7 +425,7 @@ If you use PandaProt in your research, please cite:
 
 ```
 Pritam Kumar Panda. (2025). 
-A comprehensive Python application for mapping and visualizing molecular interactions at protein/nucleic acid interfaces. GitHub repository. https://github.com/pritampanda15/PandaProt
+A comprehensive Python application for mapping and visualizing molecular interactions at protein/nucleic acid interfaces and  tool for mapping protein-protein, protein-nucleic acid, and antigen-antibody interactions. GitHub repository https://github.com/pritampanda15/PandaProt
 ```
 
 ## License
