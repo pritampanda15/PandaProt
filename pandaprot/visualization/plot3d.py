@@ -13,13 +13,30 @@ import tempfile
 import numpy as np
 from Bio.PDB import PDBIO, PDBParser, Structure
 
-def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, output_file=None, width=800, height=600, show_surface=False, interaction_types=None):
+def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, output_file=None, width=800, height=600, show_surface=False, show_sidechains=True, interaction_types=None):
     """
     Create an interactive 3D visualization for PandaProt interactions.
-    """
- 
     
-    # Parameter handling (same as before)
+    Parameters:
+    -----------
+    structure_or_interactions : Structure or dict
+        Either a Bio.PDB.Structure object or a dictionary of interactions
+    interactions_or_output : dict or str
+        Either a dictionary of interactions or an output file path
+    output_file : str, optional
+        Path to save the output HTML file
+    width : int, default=800
+        Width of the visualization in pixels
+    height : int, default=600
+        Height of the visualization in pixels
+    show_surface : bool, default=False
+        Whether to show molecular surface
+    show_sidechains : bool, default=True
+        Whether to show sidechain atoms for interacting residues
+    interaction_types : list, optional
+        List of interaction types to include (if None, include all)
+    """
+
     structure = None
     pdb_file = None
     interactions = None
@@ -521,9 +538,27 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
         total = len(interactions.get(itype, []))
         print(f"  {itype}: {count}/{total} interactions processed")
         
-        
+    # Collect all residues involved in interactions
+    interacting_residues = set()
+    
+    for data in interaction_data:
+        # Parse the label to extract residue info
+        # Example label: "Hydrogen Bond (A:42:N - B:56:O) (2.85Å)"
+        parts = data['label'].split(' - ')
+        if len(parts) >= 2:
+            res1_info = parts[0].split('(')[1].split(':')
+            res2_info = parts[1].split(':')
+            
+            if len(res1_info) >= 2:
+                chain1, res1 = res1_info[0], res1_info[1]
+                interacting_residues.add(f"{chain1}:{res1}")
+            
+            if len(res2_info) >= 2:
+                chain2, res2 = res2_info[0], res2_info[1].split(')')[0]
+                interacting_residues.add(f"{chain2}:{res2}")
     
     # Create a minimal, clean HTML template
+    # Modified HTML template with added residue display and tooltip functionality
     html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -537,6 +572,7 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
         #legend {{ position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 5px; font-family: sans-serif; max-width: 200px; }}
         .legend-item {{ display: flex; align-items: center; margin-bottom: 5px; }}
         .color-box {{ width: 15px; height: 15px; margin-right: 8px; border: 1px solid #999; }}
+        #tooltip {{ position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 8px; border-radius: 4px; font-family: sans-serif; font-size: 14px; pointer-events: none; display: none; z-index: 1000; max-width: 300px; }}
     </style>
 </head>
 <body>
@@ -546,6 +582,8 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
         <button onclick="resetView()">Reset View</button>
         <button onclick="exportImage()">Export PNG</button>
         <button onclick="clearLabels()">Clear Labels</button>
+        <button onclick="toggleSidechains()">Toggle Sidechains</button>
+        <button onclick="toggleSurface()">Toggle Surface</button>
     </div>
     
     <div id="legend">
@@ -553,10 +591,15 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
         <div id="legend-items"></div>
     </div>
     
+    <div id="tooltip"></div>
+    
     <script>
         // Initialize variables
         let viewer;
         let currentLabel = null;
+        let showingSidechains = {'true' if show_sidechains else 'false'};
+        let showingSurface = {'true' if show_surface else 'false'};
+        let tooltip = document.getElementById('tooltip');
         
         // Helper functions
         function resetView() {{
@@ -585,6 +628,59 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
             viewer.render();
         }}
         
+        function showTooltip(text, position) {{
+            // Convert 3D position to screen coordinates
+            let canvas = viewer.getCanvas();
+            let rect = canvas.getBoundingClientRect();
+            let pixelPosition = viewer.modelToScreen(position);
+            
+            tooltip.style.left = (rect.left + pixelPosition.x) + 'px';
+            tooltip.style.top = (rect.top + pixelPosition.y - 40) + 'px';
+            tooltip.innerHTML = text;
+            tooltip.style.display = 'block';
+            
+            // Hide tooltip after 3 seconds
+            setTimeout(() => {{
+                tooltip.style.display = 'none';
+            }}, 3000);
+        }}
+        
+        function toggleSidechains() {{
+            showingSidechains = !showingSidechains;
+            updateStyles();
+        }}
+        
+        function toggleSurface() {{
+            showingSurface = !showingSurface;
+            
+            if (showingSurface) {{
+                viewer.addSurface($3Dmol.VDW, {{opacity: 0.4, color: "white"}}, {{hetflag: false}});
+            }} else {{
+                viewer.removeSurface();
+            }}
+            
+            viewer.render();
+        }}
+        
+        function updateStyles() {{
+            // Base styles
+            viewer.setStyle({{}}, {{cartoon: {{color: 'lightgray', opacity: 0.8}}}});
+            viewer.setStyle({{hetflag: true}}, {{stick: {{colorscheme: 'elementColors', radius: 0.3}}}});
+            
+            // Sidechain styles for interacting residues
+            if (showingSidechains) {{
+                // Add sidechains for interacting residues
+                interactingResidues.forEach(function(res) {{
+                    viewer.setStyle({{chain: res.chain, resi: res.resi}}, 
+                        {{cartoon: {{color: 'lightgray', opacity: 0.8}},
+                         stick: {{colorscheme: 'elementColors', radius: 0.2}}}}
+                    );
+                }});
+            }}
+            
+            viewer.render();
+        }}
+        
         function exportImage() {{
             let link = document.createElement('a');
             link.download = 'pandaprot_visualization.png';
@@ -596,18 +692,44 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
         $(document).ready(function() {{
             // Create viewer
             viewer = $3Dmol.createViewer($("#container"), {{
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                width: {width},
+                height: {height}
             }});
             
             // Load PDB data
             viewer.addModel(atob("{pdb_encoded}"), "pdb");
             
+            // Define interacting residues
+            const interactingResidues = [
+"""
+    
+    # Add interacting residues data
+    for i, residue in enumerate(interacting_residues):
+        chain, resi = residue.split(':')
+        html += f"""                {{chain: "{chain}", resi: {resi}}}{',' if i < len(interacting_residues)-1 else ''}
+"""
+    
+    html += """            ];
+            
             // Set default style
-            viewer.setStyle({{}}, {{cartoon: {{color: 'lightgray', opacity: 0.8}}}});
-            viewer.setStyle({{hetflag: true}}, {{stick: {{colorscheme: 'elementColors', radius: 0.3}}}});
+            viewer.setStyle({}, {cartoon: {color: 'lightgray', opacity: 0.8}});
+            viewer.setStyle({hetflag: true}, {stick: {colorscheme: 'elementColors', radius: 0.3}});
+            
+            // Add sidechains for interacting residues if enabled
+            if (showingSidechains) {
+                interactingResidues.forEach(function(res) {
+                    viewer.setStyle({chain: res.chain, resi: res.resi}, 
+                        {cartoon: {color: 'lightgray', opacity: 0.8},
+                         stick: {colorscheme: 'elementColors', radius: 0.2}}
+                    );
+                });
+            }
             
             // Add surface if requested
-            {f'viewer.addSurface($3Dmol.VDW, {{opacity: 0.4, color: "white"}}, {{hetflag: false}});' if show_surface else ''}
+            if (showingSurface) {
+                viewer.addSurface($3Dmol.VDW, {opacity: 0.4, color: "white"}, {hetflag: false});
+            }
             
             // Add interactions
             const interactions = [
@@ -655,6 +777,29 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
                 });
             });
             
+            // Add clickable spheres for each residue for tooltips
+            interactingResidues.forEach(function(res) {
+                // Get the alpha carbon of the residue
+                const atoms = viewer.getModel().selectedAtoms({chain: res.chain, resi: res.resi, atom: 'CA'});
+                
+                if (atoms.length > 0) {
+                    const atom = atoms[0];
+                    const resname = atom.resn;
+                    
+                    viewer.addSphere({
+                        center: {x: atom.x, y: atom.y, z: atom.z},
+                        radius: 0.5,
+                        color: 'white',
+                        opacity: 0.0,  // Invisible
+                        clickable: true,
+                        callback: function() {
+                            showTooltip(`Residue: ${resname} ${res.resi} (Chain ${res.chain})`, 
+                                        {x: atom.x, y: atom.y, z: atom.z});
+                        }
+                    });
+                }
+            });
+            
             // Create legend
             const legendItems = [
 """
@@ -696,5 +841,5 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
     with open(output_file, 'w') as f:
         f.write(html)
     
-    print(f"3D visualization saved to {output_file}")
+    print(f"Enhanced 3D visualization saved to {output_file}")
     return output_file

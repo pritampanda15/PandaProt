@@ -13,6 +13,10 @@ from Bio.PDB.vectors import Vector
 import py3Dmol
 import logging as logger
 import networkx as nx
+import matplotlib
+# Use 'Agg' backend for non-GUI environments
+matplotlib.use('Agg')  # Use 'Agg' backend for non-GUI environments
+import matplotlib.pyplot as plt
 
 
 # Import all interaction modules
@@ -460,7 +464,7 @@ class PandaProt:
                     graph[u][v][key] = value.item()
 
     def create_interaction_network(self, output_file: Optional[str] = None,
-                                  interaction_types: Optional[List[str]] = None):
+                              interaction_types: Optional[List[str]] = None):
         """
         Create a network visualization of interactions.
         Args:
@@ -470,26 +474,46 @@ class PandaProt:
         if not self.interactions:
             print("No interactions to visualize. Run map_interactions() first.")
             return
+            
         if interaction_types:
             filtered_interactions = {
                 k: v for k, v in self.interactions.items() if k in interaction_types
             }
         else:
             filtered_interactions = self.interactions
-        #network_graph = network.create_interaction_network(interactions=filtered_interactions)
-        # network_graph = network.create_interaction_network(self.structure, filtered_interactions)
-        # network.visualize_network(network_graph, output_file)        
+            
+        # Get the graph and figure objects
         network_graph, fig = network.create_interaction_network(self.structure, filtered_interactions)
+        
+        # Handle PNG output with proper extension handling
         if output_file:
-            fig.savefig(output_file.replace(".html", "_network.png"), dpi=300)
-        logger.info(f"Network visualization saved to {output_file.replace('.html', '_network.png')}")
-
-        # Save the network graph as a file
+            # Create standardized output filename for PNG
+            if output_file.endswith('.png'):
+                output_png = output_file
+            elif output_file.endswith('.html'):
+                output_png = output_file.replace('.html', '.png')
+            else:
+                output_png = f"{output_file}.png"
+                
+            # Save the figure and immediately close it
+            fig.savefig(output_png, dpi=300, bbox_inches='tight')
+            plt.close(fig)  # CRITICAL: Clean up matplotlib's state
+            logger.info(f"Network visualization saved to {output_png}")
+        
+        # Handle GML output with proper extension handling
         if output_file:
             self.sanitize_gml_attributes(network_graph)
-            nx.write_gml(network_graph, output_file.replace(".html", "_network.gml"))
-
-            # Save the network graph in GML format
-            logger.info(f"Network graph saved to {output_file.replace('.html', '_network.gml')}")
+            
+            # Create standardized output filename for GML
+            if output_file.endswith('.gml'):
+                output_gml = output_file
+            elif output_file.endswith(('.html', '.png')):
+                output_gml = output_file.replace('.html', '.gml').replace('.png', '.gml')
+            else:
+                output_gml = f"{output_file}.gml"
+                
+            nx.write_gml(network_graph, output_gml)
+            logger.info(f"Network graph saved to {output_gml}")
+            
         # Return the network graph object
         return network_graph

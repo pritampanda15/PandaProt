@@ -162,6 +162,9 @@ def create_interaction_network(structure: Structure,
     plt.axis('off')
 
     # ✅ Save the finalized figure here
-    fig.savefig("interaction_network.png", dpi=300, bbox_inches='tight')
+    #fig.savefig("interaction_network.png", dpi=300, bbox_inches='tight')
+    #plt.close(fig)  # Close the figure to free memory
+    logger.info("Interaction network created successfully with %d nodes and %d edges.", 
+                G.number_of_nodes(), G.number_of_edges())
 
     return G, fig
