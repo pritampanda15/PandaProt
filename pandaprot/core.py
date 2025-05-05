@@ -336,24 +336,26 @@ class PandaProt:
             interaction_types: Types of interactions to visualize (default: all)
             
         Returns:
-            py3Dmol view object
+            Path to the saved HTML file
         """
+        # Set default output file if not provided
+        if not output_file:
+            output_file = "pandaprot_visualization.html"
+            
         # Filter interactions if specified
         interactions_to_visualize = self.interactions
         if interaction_types:
             interactions_to_visualize = {k: v for k, v in self.interactions.items() if k in interaction_types}
         
-        view = plot3d.create_3d_visualization(
-            self.pdb_file, 
-            self.structure, 
-            interactions_to_visualize
+        # Call the updated visualization function
+        html_file = plot3d.create_pandaprot_3d_viz(
+            self.pdb_file,  # This can be a file path
+            interactions_to_visualize,  # This is the interactions dictionary
+            output_file  # This is where to save the output
         )
         
-        if output_file:
-            view.write_html(output_file)
-            print(f"3D visualization saved to {output_file}")
-        
-        return view
+        print(f"3D visualization saved to {html_file}")
+        return html_file
     
     def generate_report(self, output_file: Optional[str] = None, interaction_types=None):
         """
