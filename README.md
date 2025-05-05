@@ -65,6 +65,59 @@ pip install pandaprot
 ## Usage
 
 ### Command Line Interface
+```bash
+pandaprot -h
+usage: pandaprot [-h] [--chains CHAINS [CHAINS ...]] [--3d-plot] [--export-vis] [--report] [--network] [--output OUTPUT]
+                 [--distance-cutoff DISTANCE_CUTOFF] [--include-intrachain] [--all-interactions] [--standard-only]
+                 [--hydrogen-bonds] [--ionic] [--hydrophobic] [--pi-stacking] [--pi-cation] [--salt-bridges] [--cation-pi]
+                 [--ch-pi] [--disulfide] [--sulfur-aromatic] [--water-mediated] [--metal-coordination] [--halogen-bonds]
+                 [--amide-aromatic] [--van-der-waals] [--amide-amide] [--statistics] [--residue-summary]
+                 pdb_file
+
+PandaProt: Comprehensive Protein Interaction Mapper
+
+positional arguments:
+  pdb_file              Path to PDB file
+
+options:
+  -h, --help            show this help message and exit
+  --chains CHAINS [CHAINS ...]
+                        Chains to analyze (e.g., A B)
+  --3d-plot             Generate 3D visualization
+  --export-vis          Export visualization files for PyMOL, Chimera, VMD, and Molstar
+  --report              Generate detailed interaction report
+  --network             Generate interaction network visualization
+  --output, -o OUTPUT   Output file prefix
+  --distance-cutoff DISTANCE_CUTOFF
+                        Distance cutoff for interaction detection (default: 4.5Å)
+  --include-intrachain  Include intra-chain interactions
+
+Interaction Types:
+  --all-interactions    Map all interaction types (default)
+  --standard-only       Map only standard interactions (H-bonds, ionic, hydrophobic, pi-stacking, salt bridges)
+  --hydrogen-bonds      Map hydrogen bonds
+  --ionic               Map ionic interactions
+  --hydrophobic         Map hydrophobic interactions
+  --pi-stacking         Map pi-pi stacking interactions
+  --pi-cation           Map pi-cation interactions
+  --salt-bridges        Map salt bridges
+  --cation-pi           Map cation-pi interactions
+  --ch-pi               Map CH-pi interactions
+  --disulfide           Map disulfide bridges
+  --sulfur-aromatic     Map sulfur-aromatic interactions
+  --water-mediated      Map water-mediated interactions
+  --metal-coordination  Map metal-coordinated bonds
+  --halogen-bonds       Map halogen bonds
+  --amide-aromatic      Map amide-aromatic interactions
+  --van-der-waals       Map van der Waals interactions
+  --amide-amide         Map amide-amide hydrogen bonds
+
+Analysis Options:
+  --statistics          Generate interaction statistics
+  --residue-summary     Generate residue interaction summary
+
+```
+
 # Full command
 ```bash
 pandaprot 4kpy.pdb --export-vis  --3d-plot --report --network --statistics --residue-summary --chains A B C D E F --output protein-dna-ligand
