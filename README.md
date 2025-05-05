@@ -1,6 +1,6 @@
 # PandaProt
 
-A comprehensive Python application for mapping and visualizing molecular interactions at protein interfaces.
+A comprehensive Python application for mapping and visualizing molecular interactions at protein/nucleic acid interfaces.
 
 <p align="center">
   <img src="https://github.com/pritampanda15/PandaProt/blob/main/logo/logo.png" alt="PandaProt Logo" width="400"> 
@@ -28,7 +28,7 @@ A comprehensive Python application for mapping and visualizing molecular interac
 
 ### Comprehensive Interaction Mapping
 
-PandaProt can detect and analyze a comprehensive set of molecular interactions that occur in protein structures:
+PandaProt can detect and analyze a comprehensive set of molecular interactions that occur in protein/DNA structures:
 
 **Standard Interactions:**
 - **Hydrogen Bonds**: Between hydrogen donors and acceptors (N-H···O, O-H···O, etc.)
@@ -65,6 +65,13 @@ pip install pandaprot
 ## Usage
 
 ### Command Line Interface
+# Full command
+```bash
+pandaprot 4kpy.pdb --export-vis  --3d-plot --report --network --statistics --residue-summary --chains A B C D E F --output protein-dna-ligand
+```
+```bash
+pandaprot 1BJ1.pdb --3d-plot --export-vis  --report --network --statistics --residue-summary --chains L H V W J K  --output antigen_antibody
+```
 
 ```bash
 # Basic usage - map all interactions
@@ -412,9 +419,19 @@ These distance cutoffs can be customized using the `distance_cutoff` parameter.
 - py3Dmol
 - NetworkX
 
+## Citation
+
+If you use PandaProt in your research, please cite:
+
+```
+Pritam Kumar Panda. (2025). 
+A comprehensive Python application for mapping and visualizing molecular interactions at protein/nucleic acid interfaces. GitHub repository. https://github.com/pritampanda15/PandaProt
+```
+
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 
 ## Contributing
 
