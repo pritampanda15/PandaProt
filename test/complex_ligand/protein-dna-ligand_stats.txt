@@ -1,0 +1,346 @@
+Interaction Statistics:
+Total interactions: 7828
+
+Interactions by type:
+  - hydrogen_bonds: 486
+  - ionic_interactions: 100
+  - hydrophobic_interactions: 44
+  - pi_stacking: 0
+  - pi_cation: 12
+  - salt_bridges: 74
+  - cation_pi: 12
+  - ch_pi: 18
+  - disulfide_bridges: 0
+  - sulfur_aromatic: 0
+  - water_mediated: 134
+  - metal_coordination: 0
+  - halogen_bonds: 0
+  - amide_aromatic: 4
+  - van_der_waals: 6942
+  - amide_amide: 2
+
+Average distances:
+  - hydrogen_bonds: 3.07Å
+  - ionic_interactions: 3.52Å
+  - hydrophobic_interactions: 4.05Å
+  - pi_cation: 3.96Å
+  - salt_bridges: 3.46Å
+  - cation_pi: 3.96Å
+  - ch_pi: 3.95Å
+  - amide_aromatic: 4.32Å
+  - van_der_waals: 4.03Å
+  - amide_amide: 4.40Å
+
+Most interactive residues:
+  - C:DT 1: 361 interactions
+  - E:DT 1: 357 interactions
+  - D:DG 19: 302 interactions
+  - F:DG 19: 299 interactions
+  - C:DG 2: 285 interactions
+  - E:DG 2: 283 interactions
+  - C:DA 7: 274 interactions
+  - E:DA 7: 263 interactions
+  - C:DT 6: 217 interactions
+  - E:DT 6: 192 interactions
+  - F:DA 14: 192 interactions
+  - E:DG 4: 186 interactions
+  - D:DA 11: 181 interactions
+  - C:DG 5: 180 interactions
+  - C:DG 4: 180 interactions
+  - C:DA 10: 173 interactions
+  - F:DT 10: 173 interactions
+  - D:DT 10: 170 interactions
+  - F:DA 11: 168 interactions
+  - D:DC 18: 167 interactions
+  - E:DA 10: 164 interactions
+  - C:DG 8: 162 interactions
+  - E:DG 5: 161 interactions
+  - D:DA 14: 160 interactions
+  - E:DG 8: 158 interactions
+  - F:DC 18: 158 interactions
+  - B:TRP 528: 148 interactions
+  - A:ARG 672: 146 interactions
+  - A:TRP 528: 142 interactions
+  - B:ARG 672: 138 interactions
+  - C:DA 3: 136 interactions
+  - E:DT 9: 134 interactions
+  - E:DA 3: 126 interactions
+  - C:DT 9: 125 interactions
+  - A:HIS 445: 117 interactions
+  - A:ARG 392: 114 interactions
+  - D:DT 13: 112 interactions
+  - B:ARG 446: 108 interactions
+  - B:HIS 445: 107 interactions
+  - A:ARG 446: 104 interactions
+  - B:ARG 392: 102 interactions
+  - E:DT 16: 102 interactions
+  - B:GLU 507: 100 interactions
+  - F:DT 17: 100 interactions
+  - F:DT 13: 100 interactions
+  - A:GLU 507: 98 interactions
+  - D:DT 17: 96 interactions
+  - A:ARG 615: 92 interactions
+  - A:ARG 608: 92 interactions
+  - A:LYS 675: 90 interactions
+  - B:ILE 434: 90 interactions
+  - B:LYS 675: 88 interactions
+  - A:ILE 434: 88 interactions
+  - A:ARG 611: 86 interactions
+  - B:TYR 43: 86 interactions
+  - B:ARG 615: 85 interactions
+  - B:ARG 608: 84 interactions
+  - F:DC 12: 82 interactions
+  - A:PHE 485: 76 interactions
+  - B:PHE 485: 76 interactions
+  - B:ASN 436: 75 interactions
+  - D:DC 12: 74 interactions
+  - B:ASP 521: 72 interactions
+  - A:ASP 521: 70 interactions
+  - B:LEU 389: 70 interactions
+  - C:DG 11: 70 interactions
+  - A:LEU 389: 68 interactions
+  - E:DG 11: 68 interactions
+  - F:DC 15: 68 interactions
+  - A:ASN 436: 67 interactions
+  - D:DC 16: 66 interactions
+  - A:TRP 415: 61 interactions
+  - F:DC 16: 58 interactions
+  - A:PHE 610: 58 interactions
+  - A:PHE 647: 58 interactions
+  - B:GLU 268: 58 interactions
+  - B:ARG 611: 57 interactions
+  - D:DC 15: 56 interactions
+  - B:PHE 649: 56 interactions
+  - B:PHE 610: 56 interactions
+  - B:PHE 647: 56 interactions
+  - A:ARG 427: 55 interactions
+  - A:ASN 449: 54 interactions
+  - A:THR 613: 54 interactions
+  - B:THR 613: 54 interactions
+  - A:PHE 649: 54 interactions
+  - B:ILE 671: 52 interactions
+  - B:ILE 173: 52 interactions
+  - B:ARG 427: 51 interactions
+  - B:GLU 564: 50 interactions
+  - A:ILE 671: 50 interactions
+  - A:ILE 173: 50 interactions
+  - B:ASN 449: 50 interactions
+  - C:DT 16: 50 interactions
+  - A:GLU 268: 50 interactions
+  - B:HIS 271: 50 interactions
+  - B:ASP 62: 48 interactions
+  - A:MET 413: 48 interactions
+  - C:DT 14: 48 interactions
+  - B:MET 413: 48 interactions
+  - A:GLU 393: 46 interactions
+  - A:GLN 433: 46 interactions
+  - A:ARG 651: 46 interactions
+  - E:DT 14: 46 interactions
+  - A:ARG 192: 46 interactions
+  - A:LEU 267: 46 interactions
+  - B:ARG 192: 46 interactions
+  - B:GLU 393: 44 interactions
+  - B:ARG 418: 44 interactions
+  - B:GLN 433: 44 interactions
+  - A:LEU 505: 44 interactions
+  - B:LEU 505: 44 interactions
+  - A:SER 280: 44 interactions
+  - A:TYR 43: 44 interactions
+  - B:LEU 267: 44 interactions
+  - B:TRP 415: 44 interactions
+  - A:GLU 564: 42 interactions
+  - A:ARG 418: 42 interactions
+  - E:DT 13: 42 interactions
+  - A:PRO 36: 40 interactions
+  - A:TYR 171: 40 interactions
+  - A:ARG 172: 40 interactions
+  - A:LYS 664: 40 interactions
+  - B:TYR 171: 40 interactions
+  - B:ARG 651: 40 interactions
+  - B:GLU 512: 38 interactions
+  - A:LEU 279: 38 interactions
+  - B:PRO 650: 38 interactions
+  - A:GLU 512: 37 interactions
+  - B:LYS 664: 36 interactions
+  - A:PRO 650: 36 interactions
+  - B:VAL 685: 35 interactions
+  - A:GLY 219: 34 interactions
+  - A:ASP 590: 34 interactions
+  - B:ASP 590: 34 interactions
+  - B:ALA 508: 34 interactions
+  - A:ALA 508: 34 interactions
+  - A:ARG 286: 32 interactions
+  - C:DG 15: 32 interactions
+  - B:ARG 172: 32 interactions
+  - B:ARG 286: 32 interactions
+  - B:ARG 486: 32 interactions
+  - A:SER 645: 32 interactions
+  - A:LYS 329: 32 interactions
+  - B:LEU 279: 32 interactions
+  - B:SER 280: 32 interactions
+  - A:VAL 685: 31 interactions
+  - B:LYS 329: 31 interactions
+  - E:DG 15: 30 interactions
+  - B:PRO 36: 30 interactions
+  - A:ASP 62: 30 interactions
+  - B:SER 645: 30 interactions
+  - A:ARG 513: 28 interactions
+  - A:VAL 518: 28 interactions
+  - B:VAL 518: 28 interactions
+  - B:GLY 612: 28 interactions
+  - B:GLU 524: 26 interactions
+  - B:ARG 531: 26 interactions
+  - B:ARG 513: 26 interactions
+  - B:GLY 481: 26 interactions
+  - B:ALA 648: 26 interactions
+  - B:GLU 525: 25 interactions
+  - A:ARG 531: 24 interactions
+  - A:THR 201: 24 interactions
+  - C:DT 13: 24 interactions
+  - A:GLY 481: 24 interactions
+  - B:TYR 226: 24 interactions
+  - A:TYR 226: 24 interactions
+  - A:ALA 648: 24 interactions
+  - A:GLU 525: 23 interactions
+  - A:VAL 606: 23 interactions
+  - A:GLU 524: 22 interactions
+  - A:ARG 661: 22 interactions
+  - B:ARG 661: 22 interactions
+  - B:GLY 219: 22 interactions
+  - B:GLN 509: 22 interactions
+  - A:GLN 509: 22 interactions
+  - B:LEU 435: 22 interactions
+  - B:VAL 606: 22 interactions
+  - A:LYS 422: 21 interactions
+  - A:HIS 657: 21 interactions
+  - B:HIS 657: 21 interactions
+  - B:SER 328: 21 interactions
+  - B:THR 201: 20 interactions
+  - B:ARG 580: 20 interactions
+  - B:HIS 607: 20 interactions
+  - A:LEU 435: 20 interactions
+  - A:SER 328: 20 interactions
+  - B:LYS 230: 18 interactions
+  - A:ARG 580: 18 interactions
+  - B:LEU 281: 18 interactions
+  - B:ASP 478: 18 interactions
+  - B:ARG 668: 18 interactions
+  - B:ALA 510: 18 interactions
+  - A:ALA 510: 18 interactions
+  - A:GLY 83: 18 interactions
+  - A:THR 266: 18 interactions
+  - B:ARG 59: 18 interactions
+  - B:LYS 422: 17 interactions
+  - B:ASP 660: 17 interactions
+  - A:GLY 220: 16 interactions
+  - A:LEU 281: 16 interactions
+  - A:LYS 457: 16 interactions
+  - A:HIS 607: 16 interactions
+  - A:GLY 511: 16 interactions
+  - A:GLY 612: 16 interactions
+  - B:THR 266: 16 interactions
+  - B:VAL 677: 14 interactions
+  - A:VAL 677: 14 interactions
+  - A:ASP 546: 14 interactions
+  - A:ASP 660: 14 interactions
+  - B:LYS 457: 14 interactions
+  - B:ASP 546: 14 interactions
+  - B:HIS 673: 14 interactions
+  - A:HIS 673: 14 interactions
+  - A:PRO 218: 14 interactions
+  - A:TYR 642: 14 interactions
+  - B:TYR 642: 14 interactions
+  - B:GLY 83: 14 interactions
+  - B:ARG 39: 14 interactions
+  - B:GLY 670: 14 interactions
+  - A:GLY 670: 14 interactions
+  - A:PRO 614: 14 interactions
+  - A:GLY 480: 14 interactions
+  - B:GLY 511: 14 interactions
+  - B:GLY 480: 14 interactions
+  - A:ASP 478: 13 interactions
+  - A:GLU 676: 12 interactions
+  - A:ARG 486: 12 interactions
+  - B:ARG 194: 12 interactions
+  - E:DG 12: 12 interactions
+  - B:LYS 575: 12 interactions
+  - B:VAL 42: 12 interactions
+  - B:ALA 479: 12 interactions
+  - A:ARG 39: 12 interactions
+  - B:ILE 254: 12 interactions
+  - B:GLY 220: 12 interactions
+  - A:ILE 254: 12 interactions
+  - A:ALA 450: 12 interactions
+  - A:PRO 550: 12 interactions
+  - A:LYS 575: 12 interactions
+  - B:VAL 264: 12 interactions
+  - B:ALA 450: 12 interactions
+  - B:PRO 550: 12 interactions
+  - B:PRO 614: 12 interactions
+  - B:GLU 676: 11 interactions
+  - A:LEU 674: 10 interactions
+  - B:LEU 674: 10 interactions
+  - A:GLN 551: 10 interactions
+  - B:GLN 551: 10 interactions
+  - A:PRO 37: 10 interactions
+  - B:PRO 37: 10 interactions
+  - A:LYS 230: 10 interactions
+  - A:ARG 194: 10 interactions
+  - A:LEU 265: 10 interactions
+  - A:PRO 412: 10 interactions
+  - A:ARG 668: 10 interactions
+  - B:LEU 265: 10 interactions
+  - A:ALA 479: 9 interactions
+  - A:SER 432: 8 interactions
+  - B:LEU 537: 8 interactions
+  - A:LEU 537: 8 interactions
+  - A:GLY 388: 8 interactions
+  - A:PRO 506: 8 interactions
+  - B:GLY 388: 8 interactions
+  - B:PRO 506: 8 interactions
+  - A:ALA 170: 8 interactions
+  - A:ARG 640: 8 interactions
+  - B:ALA 170: 8 interactions
+  - B:PRO 412: 8 interactions
+  - B:ARG 640: 8 interactions
+  - B:ARG 679: 6 interactions
+  - B:SER 432: 6 interactions
+  - B:LEU 221: 6 interactions
+  - A:LEU 221: 6 interactions
+  - A:PHE 487: 6 interactions
+  - B:PHE 487: 6 interactions
+  - A:ARG 59: 6 interactions
+  - A:ALA 644: 6 interactions
+  - A:ARG 482: 6 interactions
+  - B:ALA 644: 6 interactions
+  - B:ARG 482: 6 interactions
+  - A:ARG 679: 5 interactions
+  - A:GLU 428: 4 interactions
+  - B:LEU 527: 4 interactions
+  - A:LEU 527: 4 interactions
+  - B:SER 229: 4 interactions
+  - A:VAL 42: 4 interactions
+  - B:MET 82: 4 interactions
+  - A:SER 229: 4 interactions
+  - A:SER 484: 4 interactions
+  - B:SER 484: 4 interactions
+  - A:VAL 264: 4 interactions
+  - A:ALA 414: 4 interactions
+  - B:GLU 274: 4 interactions
+  - B:GLU 428: 2 interactions
+  - B:GLU 517: 2 interactions
+  - A:GLN 387: 2 interactions
+  - A:ALA 390: 2 interactions
+  - A:GLY 38: 2 interactions
+  - B:GLY 38: 2 interactions
+  - B:PRO 35: 2 interactions
+  - A:LEU 522: 2 interactions
+  - B:LEU 522: 2 interactions
+  - A:ARG 548: 2 interactions
+  - A:LYS 191: 2 interactions
+  - B:ALA 414: 2 interactions
+  - A:PHE 683: 1 interactions
+  - B:PHE 683: 1 interactions
+  - A:LEU 652: 1 interactions
+  - A:ARG 444: 1 interactions
+  - B:LEU 652: 1 interactions

@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import py3Dmol
 from Bio.PDB import Structure
 import numpy as np
@@ -12,6 +12,7 @@ import base64
 import tempfile
 import numpy as np
 from Bio.PDB import PDBIO, PDBParser, Structure
+import logging as logger
 
 def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, output_file=None, width=800, height=600, show_surface=False, show_sidechains=True, interaction_types=None):
     """
@@ -843,3 +844,5 @@ def create_pandaprot_3d_viz(structure_or_interactions, interactions_or_output, o
     
     print(f"Enhanced 3D visualization saved to {output_file}")
     return output_file
+
+

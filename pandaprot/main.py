@@ -19,6 +19,8 @@ def main():
     parser.add_argument('--chains', nargs='+', help='Chains to analyze (e.g., A B)')
     parser.add_argument('--3d-plot', action='store_true', dest='plot_3d', 
                       help='Generate 3D visualization')
+    parser.add_argument('--export-vis', action='store_true',
+                   help='Export visualization files for PyMOL, Chimera, VMD, and Molstar')
     parser.add_argument('--report', action='store_true', 
                       help='Generate detailed interaction report')
     parser.add_argument('--network', action='store_true',
@@ -169,6 +171,19 @@ def main():
     if args.network:
         output_file = f"{args.output}_network.png" if args.output else "pandaprot_network.png"
         analyzer.create_interaction_network(output_file, interaction_types)
+    
+    # In your main script
+    if args.export_vis:
+        output_prefix = args.output.replace('.html', '').replace('.pdb', '') if args.output else 'pandaprot'
+        vis_files = analyzer.export_visualization_scripts(output_prefix, interaction_types)
+        print("\nExported visualization files:")
+        for program, filename in vis_files.items():
+            print(f" - {program}: {filename}")
+    
+    # Print summary of exported files
+    print("\nExported visualization files:")
+    for program, filename in vis_files.items():
+        print(f" - {program}: {filename}")
     
     if args.statistics:
         stats = analyzer.get_interaction_statistics()
