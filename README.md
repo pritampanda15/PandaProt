@@ -21,8 +21,14 @@ A comprehensive Python application for mapping and visualizing molecular interac
   <a href="https://github.com/pritampanda15/PandaProt/network/members">
     <img src="https://img.shields.io/github/forks/pritampanda15/PandaProt?style=social" alt="GitHub Forks">
   </a>
-   <a href="https://github.com/pritampanda15/PandaProt/releases">
-    <img src="https://img.shields.io/github/downloads/pritampanda15/PandaProt/total.svg" alt="GitHub Downloads">
+  <a href="https://libraries.io/pypi/pandaprot">
+    <img src="https://img.shields.io/librariesio/release/pypi/pandaprot" alt="Libraries.io dependency status">
+  </a>
+  <!-- Custom Project Badge -->
+  <a href="https://github.com/pritampanda15/PandaProt">
+    <img src="https://img.shields.io/badge/made%20with-%F0%9F%90%BC%20PandaDock-green" alt="Made with PandaDock">
+  </a>
+
 </a>
 
   </a>
