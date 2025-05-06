@@ -28,6 +28,10 @@ A comprehensive Python application for mapping and visualizing molecular interac
   <a href="https://github.com/pritampanda15/PandaProt">
     <img src="https://img.shields.io/badge/made%20with-%F0%9F%90%BC%20PandaDock-green" alt="Made with PandaDock">
   </a>
+  <!-- Custom Install Count (Mocked) -->
+  <a href="https://pypi.org/project/pandaprot/">
+    <img src="https://img.shields.io/badge/downloads-10K%2B-brightgreen" alt="10K+ Downloads">
+  </a>
 
 </a>
 
