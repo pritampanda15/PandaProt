@@ -29,8 +29,8 @@ A comprehensive Python application for mapping and visualizing molecular interac
     <img src="https://img.shields.io/badge/made%20with-%F0%9F%90%BC%20PandaDock-green" alt="Made with PandaDock">
   </a>
   <!-- Custom Install Count (Mocked) -->
-  <a href="https://pypi.org/project/pandaprot/">
-    <img src="https://img.shields.io/badge/downloads-10K%2B-brightgreen" alt="10K+ Downloads">
+    <a href="https://pepy.tech/project/pandaprot">
+    <img src="https://static.pepy.tech/badge/pandaprot" alt="Downloads">
   </a>
 
 </a>
